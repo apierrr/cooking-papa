@@ -1,0 +1,19 @@
+# Override local, non versionné : propre à cette installation.
+#
+# Le tunnel Cloudflare atteint le conteneur par son nom sur edge_proxy
+# (http://cooking-papa:8000), donc aucun port n'a besoin d'être publié —
+# `!reset` efface la liste du compose versionné au lieu de s'y ajouter.
+# discord_link donne accès au bot par son nom de service.
+services:
+  cooking-papa:
+    ports: !reset []
+    networks:
+      - edge_proxy
+      - discord_link
+
+networks:
+  edge_proxy:
+    external: true
+  discord_link:
+    external: true
+    name: docker-config_secure_link

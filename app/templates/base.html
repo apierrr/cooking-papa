@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Cooking Papa{% endblock %}</title>
+  <link rel="icon" href="/static/favicon.svg?v={{ asset_version }}" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css?v={{ asset_version }}">
+  <script src="/static/theme.js?v={{ asset_version }}"></script>
+  <script src="/static/confirm.js?v={{ asset_version }}" defer></script>
+  <script src="/static/htmx.min.js" defer></script>
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">🍳 Cooking Papa</a>
+    <nav>
+      <a href="/">Recettes</a>
+      <a href="/recipes/new">+ Nouvelle</a>
+      <a href="/ingredients">Ingrédients</a>
+      <button type="button" id="theme-toggle" class="theme-btn" title="Changer le thème">🖥️ Auto</button>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

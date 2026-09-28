@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="search">
+  <form method="get" action="/"
+        hx-get="/" hx-target="#recipe-list" hx-push-url="true"
+        hx-trigger="change from:input[name='ing'], change from:select, keyup changed delay:300ms from:input[name='q'], submit">
+    <input type="search" name="q" value="{{ q }}" placeholder="Chercher une recette…" autocomplete="off">
+
+    <div class="filters">
+      <select name="cat" aria-label="Catégorie">
+        <option value="">Toutes catégories</option>
+        {% for key, label in CATEGORIES.items() %}
+          <option value="{{ key }}" {% if selected_cat == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <select name="origin" aria-label="Origine">
+        <option value="">Tous les pays</option>
+        {% for o in all_origins %}
+          <option value="{{ o }}" {% if selected_origin == o %}selected{% endif %}>{{ o }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <details class="ing-filter" open>
+      <summary>Filtrer par ingrédients ({{ selected_ings|length }})</summary>
+      <div class="ing-grid">
+        {% for i in all_ingredients %}
+          <label class="tag">
+            <input type="checkbox" name="ing" value="{{ i.slug }}"
+                   {% if i.slug in selected_ings %}checked{% endif %}>
+            {{ i.name }}
+          </label>
+        {% endfor %}
+        {% if not all_ingredients %}
+          <p class="muted">Aucun ingrédient enregistré pour le moment.</p>
+        {% endif %}
+      </div>
+    </details>
+  </form>
+</section>
+
+<div id="recipe-list">
+  {% include "_recipe_list.html" %}
+</div>
+{% endblock %}

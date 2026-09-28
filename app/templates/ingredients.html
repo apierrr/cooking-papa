@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Ingrédients{% endblock %}
+{% block content %}
+<h1>Ingrédients</h1>
+<p class="muted">Les ingrédients utilisés par au moins une recette ne peuvent pas être supprimés.</p>
+{% if rows %}
+<table class="ing-table">
+  <thead>
+    <tr><th>Nom</th><th>Recettes</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{{ r.ing.name }}</td>
+      <td>{{ r.count }}</td>
+      <td>
+        {% if r.count == 0 %}
+        <form method="post" action="/ingredients/{{ r.ing.id }}/delete"
+              data-confirm="Supprimer « {{ r.ing.name }} » ?">
+          <input type="hidden" name="csrf_token" value="{{ request.cookies.get('csrf_token', '') }}">
+          <button type="submit" class="danger">Supprimer</button>
+        </form>
+        {% else %}
+        <span class="muted">—</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">Aucun ingrédient enregistré.</p>
+{% endif %}
+{% endblock %}

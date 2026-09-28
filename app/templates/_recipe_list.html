@@ -1,0 +1,30 @@
+{% if recipes %}
+<ul class="cards">
+  {% for r in recipes %}
+  <li class="card">
+    <a href="/recipes/{{ r.id }}">
+      {% if r.image_path %}
+        <img src="/uploads/{{ r.image_path }}" alt="" loading="lazy">
+      {% else %}
+        <div class="placeholder">🍽️</div>
+      {% endif %}
+      <h3>{{ r.title }}</h3>
+      {% if r.category or r.origin %}
+        <p class="meta">
+          {% if r.category %}<span class="tag sm cat">{{ CATEGORIES.get(r.category, r.category) }}</span>{% endif %}
+          {% if r.origin %}<span class="tag sm">🌍 {{ r.origin }}</span>{% endif %}
+        </p>
+      {% endif %}
+    </a>
+    <p class="tags">
+      {% for ri in r.ingredients[:6] %}
+        <span class="tag sm">{{ ri.ingredient.name }}</span>
+      {% endfor %}
+      {% if r.ingredients|length > 6 %}<span class="tag sm">…</span>{% endif %}
+    </p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="muted">Aucune recette trouvée.</p>
+{% endif %}

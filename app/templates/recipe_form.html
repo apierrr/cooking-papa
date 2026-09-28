@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{% if edit_mode %}Modifier : {{ recipe.title }}{% else %}Nouvelle recette{% endif %}{% endblock %}
+{% block content %}
+<h1>{% if edit_mode %}Modifier la recette{% else %}Nouvelle recette{% endif %}</h1>
+<form method="post"
+      action="{% if edit_mode %}/recipes/{{ recipe.id }}/edit{% else %}/recipes{% endif %}"
+      enctype="multipart/form-data" id="recipe-form">
+  <input type="hidden" name="csrf_token" value="{{ request.cookies.get('csrf_token', '') }}">
+
+  <label>Titre
+    <input type="text" name="title" maxlength="200" required
+           value="{{ recipe.title if edit_mode else '' }}">
+  </label>
+
+  <div class="meta-fields">
+    <label>Catégorie
+      <select name="category">
+        <option value="">—</option>
+        {% for key, label in CATEGORIES.items() %}
+          <option value="{{ key }}" {% if edit_mode and recipe.category == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Origine (pays)
+      <input type="text" name="origin" maxlength="100" list="origin-list"
+             placeholder="Italie, Japon, Maroc…"
+             value="{{ (recipe.origin or '') if edit_mode else '' }}">
+      <datalist id="origin-list">
+        {% for o in known_origins %}<option value="{{ o }}">{% endfor %}
+      </datalist>
+    </label>
+  </div>
+
+  <label>Image {% if edit_mode and recipe.image_path %}(remplacer — actuelle : <a href="/uploads/{{ recipe.image_path }}" target="_blank">voir</a>){% else %}(optionnel){% endif %}
+    <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif">
+  </label>
+
+  <fieldset>
+    <legend>Ingrédients</legend>
+    <div id="ing-rows"
+         data-initial='{{ initial_ingredients | tojson if edit_mode else "[]" }}'></div>
+    <button type="button" id="add-ing">+ Ajouter un ingrédient</button>
+    <input type="hidden" name="ingredients_json" id="ingredients_json">
+  </fieldset>
+
+  <fieldset>
+    <legend>Étapes de préparation</legend>
+    <div id="step-rows"
+         data-initial='{{ initial_steps | tojson if edit_mode else "[]" }}'></div>
+    <button type="button" id="add-step">+ Ajouter une étape</button>
+    <input type="hidden" name="steps_json" id="steps_json">
+  </fieldset>
+
+  <label>Commentaire
+    <textarea name="comment" rows="4" maxlength="5000"
+              placeholder="Notes, variantes, astuces…">{{ (recipe.comment or '') if edit_mode else '' }}</textarea>
+  </label>
+
+  <button type="submit">Enregistrer</button>
+</form>
+<script src="/static/recipe_form.js?v={{ asset_version }}" defer></script>
+{% endblock %}

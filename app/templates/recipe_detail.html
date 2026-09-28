@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.title }}{% endblock %}
+{% block content %}
+<article class="recipe">
+  <h1>{{ recipe.title }}</h1>
+  {% if recipe.category or recipe.origin %}
+    <p class="recipe-meta">
+      {% if recipe.category %}<span class="tag">{{ CATEGORIES.get(recipe.category, recipe.category) }}</span>{% endif %}
+      {% if recipe.origin %}<span class="tag">🌍 {{ recipe.origin }}</span>{% endif %}
+    </p>
+  {% endif %}
+  {% if recipe.image_path %}
+    <img class="hero" src="/uploads/{{ recipe.image_path }}" alt="">
+  {% endif %}
+
+  <h2>Ingrédients</h2>
+  <ul>
+    {% for ri in recipe.ingredients %}
+      <li>{% if ri.quantity %}<strong>{{ ri.quantity }}</strong> {% endif %}{{ ri.ingredient.name }}</li>
+    {% endfor %}
+  </ul>
+
+  <h2>Préparation</h2>
+  {% if steps %}
+    <ol class="steps">
+      {% for s in steps %}
+        <li>{{ s }}</li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="muted">Aucune étape renseignée.</p>
+  {% endif %}
+
+  {% if recipe.comment %}
+    <h2>Commentaire</h2>
+    <div class="comment">{{ recipe.comment }}</div>
+  {% endif %}
+
+  <section class="actions">
+    <form hx-post="/recipes/{{ recipe.id }}/prepare"
+          hx-target="#prepare-result"
+          hx-swap="innerHTML">
+      <input type="hidden" name="csrf_token" value="{{ request.cookies.get('csrf_token', '') }}">
+      <input type="text" name="note" maxlength="500" placeholder="Note (optionnel)">
+      <button type="submit">🔔 Demander la préparation</button>
+    </form>
+    <div id="prepare-result"></div>
+
+    <div class="row">
+      <a href="/recipes/{{ recipe.id }}/edit"><button type="button">✏️ Modifier</button></a>
+      <form method="post" action="/recipes/{{ recipe.id }}/delete"
+            data-confirm="Supprimer la recette « {{ recipe.title }} » ?" class="danger">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('csrf_token', '') }}">
+        <button type="submit">Supprimer</button>
+      </form>
+    </div>
+  </section>
+</article>
+{% endblock %}

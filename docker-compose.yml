@@ -1,0 +1,33 @@
+# Cooking Papa — carnet de recettes familial.
+#
+# Ce compose fonctionne tel quel : l'application est publiée sur
+# http://127.0.0.1:8090. Derrière un reverse-proxy ou un tunnel, on préfère
+# brancher le conteneur sur un réseau partagé et retirer le port — voir
+# docker-compose.override.yml.example.
+services:
+  cooking-papa:
+    build: .
+    container_name: cooking-papa
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8000"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    environment:
+      - DATABASE_URL=sqlite:////app/data/cooking.db
+      - UPLOAD_DIR=/app/uploads
+      - MAX_UPLOAD_MB=20
+      - CSRF_SECRET=${CSRF_SECRET:?set CSRF_SECRET in .env}
+      # Notification Discord facultative : l'application poste sur /dm/send
+      # d'un bot joignable à DISCORD_HOST. Laisser DISCORD_ENABLED=false pour
+      # s'en passer (la demande de préparation est alors seulement enregistrée).
+      - DISCORD_HOST=${DISCORD_HOST:-http://host.docker.internal:5000}
+      - DISCORD_TARGET_USER=${DISCORD_TARGET_USER:-}
+      - DISCORD_ENABLED=${DISCORD_ENABLED:-false}
+    extra_hosts:
+      # Pour joindre un bot qui écoute sur 127.0.0.1 de l'hôte
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }

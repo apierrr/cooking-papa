@@ -1,0 +1,17 @@
+# Secrets
+.env
+
+# Données de l'application
+data/*.db
+data/*.db-journal
+uploads/
+*.db
+
+# Propre à la machine
+docker-compose.override.yml
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

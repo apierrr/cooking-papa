@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -8,7 +10,13 @@ from .security import SECURITY_HEADERS, CSRF_COOKIE, CSRF_MAX_AGE, issue_csrf_to
 from .routes import recipes, search, prepare, ingredients
 
 
-app = FastAPI(title="Cooking Papa", docs_url=None, redoc_url=None, openapi_url=None)
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="Cooking Papa", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -37,11 +45,6 @@ app.include_router(search.router)
 app.include_router(recipes.router)
 app.include_router(prepare.router)
 app.include_router(ingredients.router)
-
-
-@app.on_event("startup")
-def _startup():
-    init_db()
 
 
 @app.get("/healthz")
